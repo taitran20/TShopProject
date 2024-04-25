@@ -25,4 +25,15 @@ public class Role {
         this.name = name;
         this.description = description;
     }
+
+    public Role(Integer id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
