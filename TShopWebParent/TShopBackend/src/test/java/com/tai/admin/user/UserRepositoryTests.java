@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
-import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -53,14 +52,16 @@ public class UserRepositoryTests {
 
     @Test
     public void testGetUserById(){
-        User user = userRepository.findById(1L).get();
+        User user = userRepository.findById(1L).orElse(null);
+        assert user != null;
         System.out.println(user.getFirstName());
         assertThat(user).isNotNull();
     }
 
     @Test
     public void testUpdateUserDetails(){
-        User user = userRepository.findById(1L).get();
+        User user = userRepository.findById(1L).orElse(null);
+        assert user != null;
         user.setEnabled(true);
         userRepository.save(user);
     }
