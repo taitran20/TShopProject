@@ -17,6 +17,9 @@
         <h1>Manage User</h1>
         <a th:href="@{/users/new}"><span class="badge bg-primary">Create New User</span></a>
     </div>
+    <div th:if="${param.message != null}" class="alert alert-success text-center">
+        [[${param.message}]]
+    </div>
     <div class="container-fluid">
         <table class="table table-hover table-bordered table-responsive-md">
             <thead class="table-secondary">

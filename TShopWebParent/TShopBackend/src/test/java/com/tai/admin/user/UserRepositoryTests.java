@@ -86,4 +86,10 @@ public class UserRepositoryTests {
         assert user != null;
         userRepository.delete(user);
     }
+
+    @Test
+    public void testGetUserByEmail(){
+        User user = userRepository.getUserByEmail("tai@gmail.com");
+        assertThat(user).isNotNull();
+    }
 }

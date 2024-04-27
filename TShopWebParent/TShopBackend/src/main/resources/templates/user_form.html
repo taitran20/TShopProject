@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Admin</title>
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
-    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/dist/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
@@ -16,13 +16,56 @@
     <div class="container-fluid">
         <h1>Manage User | Create New User</h1>
     </div>
-    <form th:action="@{/users/save}" method="post" style="max-width: 700px; margin: 0 auto">
+    <form th:action="@{/users/save}" method="post" style="max-width: 700px; margin: 0 auto" th:object="${user}" onsubmit="return checkEmailUnique(this);">
         <div class="container-fluid border border-secondary rounded p-3">
             <div class="form-group row" style="margin: 10px">
-                <label class="col-sm-4 col-form-label">E-mail</label>
+                <label class="col-sm-4 col-form-label">E-mail:</label>
                 <div class="col-sm-8">
                     <label class="col-sm-8">
-                        <input type="email" class="form-control"/>
+                        <input type="email" class="form-control" th:field="*{email}" required minlength="8" maxlength="128"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row" style="margin: 10px">
+                <label class="col-sm-4 col-form-label">First Name:</label>
+                <div class="col-sm-8">
+                    <label class="col-sm-8">
+                        <input type="text" class="form-control" th:field="*{firstName}" required minlength="2" maxlength="45"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row" style="margin: 10px">
+                <label class="col-sm-4 col-form-label">Last Name:</label>
+                <div class="col-sm-8">
+                    <label class="col-sm-8">
+                        <input type="text" class="form-control" th:field="*{lastName}" required minlength="2" maxlength="45"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row" style="margin: 10px">
+                <label class="col-sm-4 col-form-label">Password:</label>
+                <div class="col-sm-8">
+                    <label class="col-sm-8">
+                        <input type="password" class="form-control" th:field="*{password}" required minlength="6" maxlength="20"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row" style="margin: 10px">
+                <label class="col-sm-4 col-form-label">Roles:</label>
+                <div class="col-sm-8">
+                    <th:block th:each="role:${roles}">
+                        <label>
+                            <input class="m-2" type="checkbox" th:field="*{roles}" th:text="${role.name}" th:value="${role.id}">
+                            - <small>[[${role.description}]]</small>
+                        </label>
+                    </th:block>
+                </div>
+            </div>
+            <div class="form-group row" style="margin: 10px">
+                <label class="col-sm-4 col-form-label">Enable:</label>
+                <div class="col-sm-8">
+                    <label>
+                        <input type="checkbox" th:field="*{enabled}"/>
                     </label>
                 </div>
             </div>
@@ -30,12 +73,67 @@
             <div class="text-center">
                 <label>
                     <input type="submit" value="Save" class="btn btn-primary m-3">
-                    <input type="button" value="Cancel" class="btn btn-secondary">
+                    <input type="button" value="Cancel" class="btn btn-secondary" id="btnCancel">
                 </label>
             </div>
         </div>
     </form>
+    <div class="modal fade text-center" id="modalDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalTitle">Warning</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <span id="modalBody"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div th:replace="footer :: footer"></div>
 </div>
 </body>
+<script type="text/javascript">
+    function back() {
+        window.location.href = "[[@{/users}]]"
+    }
+    document.getElementById("btnCancel").addEventListener("click", back);
+
+</script>
+<script>
+    checkEmailUrl = "[[@{/users/check_email}]]";
+    function checkEmailUnique(form) {
+        var userEmail = $("#email").val();
+        $.ajax({
+            type: "POST",
+            url: checkEmailUrl,
+            data: { email: userEmail },
+            success: function(response) {
+                if (response === "OK") {
+                    form.submit();
+                } else if (response === "Duplicated"){
+                    showModalDialog("Warning","There is another user having email.");
+                }
+                else{
+                    showModalDialog("Warning","Unknown response from server.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+
+        return false;
+    }
+
+    function showModalDialog(title, message) {
+        $("#modalTitle").text(title);
+        $("#modalBody").text(message);
+        $('#modalDialog').modal('show');
+    }
+</script>
 </html>
