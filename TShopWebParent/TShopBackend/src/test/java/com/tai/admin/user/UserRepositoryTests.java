@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
@@ -91,5 +92,13 @@ public class UserRepositoryTests {
     public void testGetUserByEmail(){
         User user = userRepository.getUserByEmail("tai@gmail.com");
         assertThat(user).isNotNull();
+    }
+    @Test
+    public void testChangeStatusUser(){
+        User user = userRepository.findById(3L)
+                .orElseThrow(() -> new UsernameNotFoundException("Not found"));
+        user.setEnabled(true);
+        userRepository.save(user);
+        System.out.println(user.isEnabled());
     }
 }
